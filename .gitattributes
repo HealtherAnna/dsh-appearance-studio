@@ -1,0 +1,9 @@
+# 统一换行符，避免 Windows 上出现 CRLF/LF 反复变动的噪音
+* text=auto eol=lf
+
+# 二进制资源（若有）保持原样
+*.ico binary
+*.png binary
+*.jpg binary
+*.gif binary
+*.woff2 binary
