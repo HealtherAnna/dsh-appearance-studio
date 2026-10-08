@@ -1,0 +1,52 @@
+name: Release
+
+# 推一个 v* 标签就自动完成：跑测试 → 打包 → 建 GitHub Release 并附上安装包。
+# 如果仓库配置了 NPM_TOKEN secret，还会顺带发布到 npm（没配则自动跳过）。
+#
+# 用法：
+#   git tag v1.0.0 && git push origin v1.0.0
+#
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      # GitHub 不允许在 step 的 if 里直接引用 secrets，所以先算成一个普通环境变量
+      HAS_NPM_TOKEN: ${{ secrets.NPM_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: 跑测试
+        run: node test/smoke.mjs
+
+      - name: 打包
+        run: npm pack
+
+      - name: 建 GitHub Release 并附上安装包
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            --title "${GITHUB_REF_NAME}" \
+            --generate-notes \
+            ./*.tgz \
+          || gh release upload "${GITHUB_REF_NAME}" ./*.tgz --clobber
+
+      - name: 发布到 npm（仅当配置了 NPM_TOKEN）
+        if: env.HAS_NPM_TOKEN == 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish
