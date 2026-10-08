@@ -92,7 +92,7 @@ window.__ModuleLoader__.load({
 
     var DEFAULTS = {
       version: 1,
-      theme: { enabled: false, brand: '#4d6bfe', recolorStatics: false },
+      theme: { enabled: false, brand: '#4d6bfe' },
       wallpaper: { enabled: false, opacity: 1, blur: 0, dim: 0, mask: 0.8, fit: 'cover', layer: 'below', position: 'center' },
       icons: { tray: false, app: false, appliedAt: null },
     }
@@ -174,14 +174,11 @@ window.__ModuleLoader__.load({
         decls.push('--dsw-focus-ring-color:color-mix(in srgb, ' + b + ' 62%, transparent) !important')
         decls.push('--dsw-alias-interactive-bg-hover-accent:' + rgba(b, 0.18) + ' !important')
         css += sel + '{' + decls.join(';') + '}'
-        if (settings.theme.recolorStatics) {
-          css += sel + '{' +
-            '--dsw-alias-brand-primary:' + b + ' !important;' +
-            '--dsw-alias-button-primary-fill:' + b + ' !important;' +
-            '--dsw-alias-button-primary-hover:color-mix(in srgb, ' + b + ' 86%, #ffffff) !important;' +
-            '--dsw-alias-button-primary-dimmed:' + rgba(b, 0.52) + ' !important;' +
-            '--dsw-specific-sidebar-nav-item-active-accent:' + b + ' !important}'
-        }
+        // 这里**故意不动** --dsw-alias-brand-primary / button-primary-fill / label-primary-*。
+        // DSH 的按钮配色是成对定义的：亮色是「近黑底 + 白字」、暗色是「近白底 + 黑字」。
+        // 只换底色而不换配对的文字色，按钮就会变成看不见内容的色块；反过来改那些
+        // label-* 文字变量又会让普通文字失去对比度。改它们等于动 DSH 的单色设计基础，
+        // 牵连太广，所以主题色只走色阶这一条路。
       }
 
       var wp = settings.wallpaper
@@ -445,16 +442,11 @@ window.__ModuleLoader__.load({
             onClick: function () { patch('theme', 'brand', c) },
           })
         })),
-        h(Row, { between: true },
-          h('span', { className: 'dshskin-label' }, '同时改按钮底色与前景色（激进模式）'),
-          h('input', {
-            className: 'dshskin-check', type: 'checkbox', checked: !!draft.theme.recolorStatics,
-            onChange: function (e) { patch('theme', 'recolorStatics', e.target.checked) },
-          })),
         h('div', { className: 'dshskin-hint' },
           '改的是 DSH 官方的品牌蓝色阶 ', h('code', null, '--dsw-static-deepseek-*'),
-          '，链接 / 高亮 / 焦点环都会跟着派生。拖动色盘即时预览，点「应用并保存」才落盘。',
-          '激进模式会连按钮的黑白底色一起改，可能影响可读性。'))
+          '，链接 / 高亮 / 状态色 / 焦点环都会跟着派生。拖动色盘即时预览，点「应用并保存」才落盘。',
+          h('br'),
+          '主要按钮会保持 DSH 原本的黑白设计——那是它的设计语言，强行改色会让按钮文字失去对比度。'))
 
       // ── 背景图 ──
       var wallpaperPane = h('div', { className: 'dshskin-pane' },
