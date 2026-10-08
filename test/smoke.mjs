@@ -1,5 +1,5 @@
 /**
- * dsh-skin-studio 冒烟测试
+ * dsh-appearance-studio 冒烟测试
  *
  * 不需要 DSH 客户端：用一个 mock 的 cordis 上下文拿到插件注册的路由，
  * 再用真实 HTTP 服务器把所有端点跑一遍。
@@ -41,7 +41,7 @@ const routes = []
 const injectTable = []
 const plugin = (await import('../lib/index.js')).default
 
-check('插件导出 name', plugin.name === 'dsh-skin-studio', plugin.name)
+check('插件导出 name', plugin.name === 'dsh-appearance-studio', plugin.name)
 check('插件导出 apply', typeof plugin.apply === 'function')
 
 const injectSubscribers = []

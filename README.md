@@ -52,11 +52,30 @@
 
 ## 安装
 
-插件仓库：<https://github.com/HealtherAnna/dsh-skin-studio>
+| | |
+|---|---|
+| **npm 包名** | `dsh-appearance-studio` |
+| **GitHub 仓库** | <https://github.com/HealtherAnna/dsh-skin-studio> |
 
-### 官方桌面客户端（推荐）
+> npm 包名和仓库名不一样：`dsh-skin-studio` 这个名字在 npm 上已被他人占用，所以发布时用了 `dsh-appearance-studio`。
 
-桌面客户端读取的是 `desktop` 配置档，命令行工具按设计不允许直接改它，所以**最省事的方式是把仓库放到本地，再让客户端里的 DSH 自己装**。
+### 方式一：从 npm 安装（最简单）
+
+Web 版：
+
+```bash
+dsh plugin --profile web add dsh-appearance-studio
+```
+
+桌面客户端：直接在任意会话里说一句
+
+> 帮我把 `dsh-appearance-studio` 这个插件装上
+
+> 命令行安装需要系统里有 `pnpm`；没有的话先执行 `npm install -g pnpm`。
+
+### 方式二：从 GitHub / 本地目录安装
+
+适合想改代码，或 npm 上暂时装不到的情况。
 
 **1. 把仓库克隆到一个固定、以后不会移动的位置**
 
@@ -72,23 +91,15 @@ git clone https://github.com/HealtherAnna/dsh-skin-studio.git
 
 > 帮我把 `<克隆目录的绝对路径>` 这个插件装上
 
-DSH 会调用内置的插件管理器完成安装（它自带 pnpm，不需要你另外装）。
-
 **3. 重启客户端**
 
-重启后就能在设置里看到「外观工作室」。
+### 关于桌面客户端
+
+桌面客户端读取的是 `desktop` 配置档，命令行工具按设计不允许直接改它，所以桌面端统一用「在会话里说一句」的方式安装（客户端内置的插件管理器会处理）。
+
+装完**重启一次客户端**，就能在设置里看到「外观工作室」。
 
 > 重启后没看到入口？先确认插件确实安装成功，再重启一次 —— 客户端插件是在启动时装配的。
-
-### Web 版（`dsh web`）
-
-```bash
-dsh plugin --profile web add github:HealtherAnna/dsh-skin-studio
-```
-
-装完重启 `dsh web`，然后按 `Ctrl + F5` 强制刷新浏览器。
-
-> 命令行安装需要系统里有 `pnpm`。没有的话先执行 `npm install -g pnpm`。
 
 ---
 
@@ -166,8 +177,8 @@ DSH 升级会覆盖图标文件。重新点一次「应用到客户端」即可�
 
 1. 在「设置 → 外观工作室 → 图标」里点「**还原原图标**」，恢复原始图标
 2. 移除插件：
-   - Web 版：`dsh plugin --profile web remove dsh-skin-studio`
-   - 桌面端：在插件管理界面移除
+   - npm 安装的：`dsh plugin --profile web remove dsh-appearance-studio`
+   - 本地目录安装的：在插件管理界面移除
 3. 可选：删除数据目录 `%USERPROFILE%\.dsh\dsh-skin`，里面是你保存的设置、背景图和上传的图标
 
 ---

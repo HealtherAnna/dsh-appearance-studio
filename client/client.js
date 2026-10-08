@@ -1,5 +1,5 @@
 /**
- * dsh-skin-studio —— 客户端插件（设置页里的「外观工作室」）
+ * dsh-appearance-studio —— 客户端插件（设置页里的「外观工作室」）
  *
  * 由 DSH 的客户端模块加载器加载，所以必须是 __ModuleLoader__ factory 格式，
  * 而不是普通 ESM：react / react-dom 由 loader 的模块表提供（见 dshmarket 的约定）。
@@ -16,7 +16,7 @@
  * 注入页面（与 DSH 官方主题包 bootThemeStyle 同一机制），类名统一 .dshskin- 前缀。
  */
 window.__ModuleLoader__.load({
-  id: 'dsh-skin-studio',
+  id: 'dsh-appearance-studio',
   factory: function (require) {
     var module = { exports: {} }
     var exports = module.exports
@@ -604,7 +604,7 @@ window.__ModuleLoader__.load({
     }
 
     // ── 插件导出 ────────────────────────────────────────────────────────────
-    var name = 'dsh-skin-studio'
+    var name = 'dsh-appearance-studio'
     var inject = ['slots']
 
     function apply(ctx) {

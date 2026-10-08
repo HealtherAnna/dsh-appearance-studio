@@ -35,7 +35,7 @@ dsh-skin-studio/
 
 ```js
 window.__ModuleLoader__.load({
-  id: 'dsh-skin-studio',            // 必须等于 package.json 的 name
+  id: 'dsh-appearance-studio',            // 必须等于 package.json 的 name
   factory(require) {
     const react = require('react')
     function apply(ctx) { /* ... */ }

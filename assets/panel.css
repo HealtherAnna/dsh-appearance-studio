@@ -1,5 +1,5 @@
 /* ============================================================================
- * dsh-skin-studio 设置面板样式
+ * dsh-appearance-studio 设置面板样式
  *
  * 由宿主作为 `webserver/index-inject` 的 style 行注入（与 DSH 官方主题包
  * bootThemeStyle 走同一条机制），**不再依赖 Shadow DOM 内动态建 <style>**——
