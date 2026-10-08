@@ -54,28 +54,10 @@
 
 | | |
 |---|---|
-| **npm 包名** | `dsh-appearance-studio` |
 | **GitHub 仓库** | <https://github.com/HealtherAnna/dsh-skin-studio> |
+| **npm 包名** | `dsh-appearance-studio` |
 
-> npm 包名和仓库名不一样：`dsh-skin-studio` 这个名字在 npm 上已被他人占用，所以发布时用了 `dsh-appearance-studio`。
-
-### 方式一：从 npm 安装（最简单）
-
-Web 版：
-
-```bash
-dsh plugin --profile web add dsh-appearance-studio
-```
-
-桌面客户端：直接在任意会话里说一句
-
-> 帮我把 `dsh-appearance-studio` 这个插件装上
-
-> 命令行安装需要系统里有 `pnpm`；没有的话先执行 `npm install -g pnpm`。
-
-### 方式二：从 GitHub / 本地目录安装
-
-适合想改代码，或 npm 上暂时装不到的情况。
+### 方式一：从 GitHub 安装（当前可用）
 
 **1. 把仓库克隆到一个固定、以后不会移动的位置**
 
@@ -92,6 +74,22 @@ git clone https://github.com/HealtherAnna/dsh-skin-studio.git
 > 帮我把 `<克隆目录的绝对路径>` 这个插件装上
 
 **3. 重启客户端**
+
+### 方式二：从 npm 安装
+
+> ⚠️ **这个包目前尚未发布到 npm**。该名字（`dsh-skin-studio`）在 npm 上曾被他人占用，改名后的发布流程还在走，发布完成后即可使用下面两种方式。
+
+Web 版：
+
+```bash
+dsh plugin --profile web add dsh-appearance-studio
+```
+
+桌面客户端：在任意会话里说一句
+
+> 帮我把 `dsh-appearance-studio` 这个插件装上
+
+> 命令行安装需要系统里有 `pnpm`；没有的话先执行 `npm install -g pnpm`。
 
 ### 关于桌面客户端
 
