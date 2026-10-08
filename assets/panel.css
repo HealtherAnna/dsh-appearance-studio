@@ -1,0 +1,295 @@
+/* ============================================================================
+ * dsh-skin-studio 设置面板样式
+ *
+ * 由宿主作为 `webserver/index-inject` 的 style 行注入（与 DSH 官方主题包
+ * bootThemeStyle 走同一条机制），**不再依赖 Shadow DOM 内动态建 <style>**——
+ * 后者在桌面端实测没有生效。
+ *
+ * 全部类名以 .dshskin- 前缀隔离，避免与 DSH 自身样式冲突；
+ * 配色一律优先取 DSH 的设计令牌 --dsw-*，这样明暗主题自动跟随。
+ * ========================================================================== */
+
+.dshskin {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 2px 0 24px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--dsw-alias-label-primary, #111);
+}
+
+/* ── 分段标题 ───────────────────────────────────────────────────────────── */
+.dshskin-h1 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--dsw-alias-label-primary, #111);
+}
+.dshskin-sub {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--dsw-alias-label-tertiary, #8b8b93);
+  line-height: 1.6;
+}
+
+/* ── 页签 ───────────────────────────────────────────────────────────────── */
+.dshskin-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--dsw-alias-border-l1, #e8e8ea);
+}
+.dshskin-tab {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  color: var(--dsw-alias-label-secondary, #666);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  border-radius: 7px 7px 0 0;
+  transition: color .12s, background .12s;
+}
+.dshskin-tab:hover {
+  background: var(--dsw-alias-interactive-bg-hover, rgba(0, 0, 0, .045));
+  color: var(--dsw-alias-label-primary, #111);
+}
+.dshskin-tab[data-on="1"] {
+  color: var(--dsw-alias-label-primary, #111);
+  font-weight: 600;
+  border-bottom-color: var(--dsw-static-deepseek-500, #4176e6);
+}
+
+/* ── 面板与卡片 ─────────────────────────────────────────────────────────── */
+.dshskin-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.dshskin-pane[hidden] { display: none; }
+
+.dshskin-card {
+  border: 1px solid var(--dsw-alias-border-l2, #e2e2e6);
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  background: var(--dsw-alias-bg-layer-1, transparent);
+}
+.dshskin-card > h4 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ── 行与文本 ───────────────────────────────────────────────────────────── */
+.dshskin-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dshskin-row.between { justify-content: space-between; }
+.dshskin-label {
+  font-size: 12px;
+  color: var(--dsw-alias-label-secondary, #666);
+  flex: none;
+}
+.dshskin-value {
+  font-size: 12px;
+  color: var(--dsw-alias-label-tertiary, #8b8b93);
+  font-variant-numeric: tabular-nums;
+  min-width: 44px;
+  text-align: right;
+}
+.dshskin-hint {
+  font-size: 11px;
+  color: var(--dsw-alias-label-tertiary, #8b8b93);
+  line-height: 1.7;
+}
+.dshskin-hint code {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 11px;
+  background: var(--dsw-alias-markdown-inline-code, rgba(128, 128, 128, .14));
+  border-radius: 4px;
+  padding: 1px 4px;
+}
+.dshskin-warn {
+  font-size: 11px;
+  color: var(--dsw-alias-state-warn-primary, #b45309);
+  line-height: 1.7;
+}
+.dshskin-ok { color: var(--dsw-alias-state-success-primary, #22c55e); }
+.dshskin-err { color: var(--dsw-alias-state-error-primary, #ef4444); }
+.dshskin-mono {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 11px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.7;
+  color: var(--dsw-alias-label-tertiary, #8b8b93);
+}
+
+/* ── 控件 ───────────────────────────────────────────────────────────────── */
+.dshskin-color {
+  width: 46px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid var(--dsw-alias-border-l2, #d8d8dd);
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  flex: none;
+}
+.dshskin-hex {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 9px;
+  border-radius: 8px;
+  font: 12px ui-monospace, Consolas, monospace;
+  text-transform: lowercase;
+  border: 1px solid var(--dsw-alias-border-l2, #d8d8dd);
+  background: var(--dsw-alias-bg-layer-2, transparent);
+  color: inherit;
+}
+.dshskin-range {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--dsw-static-deepseek-500, #4176e6);
+}
+.dshskin-select {
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  border: 1px solid var(--dsw-alias-border-l2, #d8d8dd);
+  background: var(--dsw-alias-bg-layer-2, transparent);
+  color: inherit;
+}
+.dshskin-check {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  accent-color: var(--dsw-static-deepseek-500, #4176e6);
+  cursor: pointer;
+}
+
+/* ── 色板 ───────────────────────────────────────────────────────────────── */
+.dshskin-swatches {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 6px;
+}
+.dshskin-sw {
+  aspect-ratio: 1 / 1;
+  border-radius: 7px;
+  border: 1px solid rgba(128, 128, 128, .28);
+  cursor: pointer;
+  padding: 0;
+  transition: transform .12s;
+}
+.dshskin-sw:hover { transform: scale(1.09); }
+.dshskin-sw[data-on="1"] {
+  box-shadow: 0 0 0 2px var(--dsw-alias-bg-layer-1, #fff), 0 0 0 4px var(--dsw-static-deepseek-500, #4176e6);
+}
+
+/* ── 按钮 ───────────────────────────────────────────────────────────────── */
+.dshskin-btn {
+  appearance: none;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1px solid var(--dsw-alias-border-l2, #d8d8dd);
+  background: var(--dsw-alias-bg-layer-2, transparent);
+  color: var(--dsw-alias-label-primary, #111);
+  transition: background .12s, filter .12s;
+}
+.dshskin-btn:hover { background: var(--dsw-alias-interactive-bg-hover, rgba(0, 0, 0, .05)); }
+.dshskin-btn:disabled { opacity: .45; cursor: not-allowed; }
+.dshskin-btn.primary {
+  background: var(--dsw-static-deepseek-500, #4176e6);
+  border-color: transparent;
+  color: #fff;
+  font-weight: 600;
+}
+.dshskin-btn.primary:hover { filter: brightness(1.08); }
+.dshskin-bar {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+/* ── 背景图上拖放区 ─────────────────────────────────────────────────────── */
+.dshskin-drop {
+  border: 1px dashed var(--dsw-alias-border-l3, #c8c8d0);
+  border-radius: 10px;
+  padding: 20px 14px;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.8;
+  cursor: pointer;
+  color: var(--dsw-alias-label-tertiary, #8b8b93);
+  transition: border-color .14s, background .14s;
+}
+.dshskin-drop:hover,
+.dshskin-drop[data-over="1"] {
+  border-color: var(--dsw-static-deepseek-500, #4176e6);
+  background: var(--dsw-alias-interactive-bg-hover, rgba(0, 0, 0, .03));
+}
+.dshskin-thumb {
+  width: 100%;
+  max-height: 168px;
+  object-fit: cover;
+  border-radius: 9px;
+  display: block;
+  background: var(--dsw-alias-bg-skeleton, rgba(128, 128, 128, .12));
+}
+
+/* ── 图标槽 ─────────────────────────────────────────────────────────────── */
+.dshskin-iconslot {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.dshskin-iconbox {
+  width: 60px;
+  height: 60px;
+  flex: none;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--dsw-alias-bg-skeleton, rgba(128, 128, 128, .1));
+  border: 1px solid var(--dsw-alias-border-l1, #e8e8ea);
+}
+.dshskin-iconbox img {
+  max-width: 48px;
+  max-height: 48px;
+  object-fit: contain;
+}
+.dshskin-iconbox .dshskin-empty {
+  font-size: 10px;
+  color: var(--dsw-alias-label-tertiary, #8b8b93);
+}
+.dshskin-iconcol {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+/* ── 结果提示 ───────────────────────────────────────────────────────────── */
+.dshskin-note {
+  font-size: 11px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-all;
+}

@@ -1,0 +1,53 @@
+{
+  "name": "dsh-skin-studio",
+  "version": "1.0.0",
+  "description": "DSH 外观工作室：在设置里换主题色、放背景图、替换桌面与托盘图标",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "theme",
+    "skin",
+    "wallpaper",
+    "tray-icon",
+    "customization"
+  ],
+  "license": "MIT",
+  "author": "HealtherAnna",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HealtherAnna/dsh-skin-studio.git"
+  },
+  "homepage": "https://github.com/HealtherAnna/dsh-skin-studio#readme",
+  "bugs": {
+    "url": "https://github.com/HealtherAnna/dsh-skin-studio/issues"
+  },
+  "type": "module",
+  "main": "lib/index.js",
+  "files": [
+    "lib",
+    "client",
+    "assets",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-settings"
+      ]
+    }
+  },
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./client/client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  }
+}
