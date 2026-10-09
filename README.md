@@ -54,7 +54,7 @@
 
 | | |
 |---|---|
-| **GitHub 仓库** | <https://github.com/HealtherAnna/dsh-skin-studio> |
+| **GitHub 仓库** | <https://github.com/HealtherAnna/dsh-appearance-studio> |
 | **npm 包名** | `dsh-appearance-studio` |
 
 ### 方式一：从 GitHub 安装（当前可用）
@@ -62,7 +62,7 @@
 **1. 把仓库克隆到一个固定、以后不会移动的位置**
 
 ```bash
-git clone https://github.com/HealtherAnna/dsh-skin-studio.git
+git clone https://github.com/HealtherAnna/dsh-appearance-studio.git
 ```
 
 也可以直接下载 ZIP 解压。关键是这个目录之后别移动或删除——用软链方式安装时，移动了就得重新装一次。
@@ -77,7 +77,7 @@ git clone https://github.com/HealtherAnna/dsh-skin-studio.git
 
 ### 方式二：从 npm 安装
 
-> ⚠️ **这个包目前尚未发布到 npm**。该名字（`dsh-skin-studio`）在 npm 上曾被他人占用，改名后的发布流程还在走，发布完成后即可使用下面两种方式。
+> ⚠️ **这个包目前尚未发布到 npm**。旧名 `dsh-skin-studio` 在 npm 上已被他人占用，因此改名为 `dsh-appearance-studio`；发布流程完成后即可使用下面两种方式。
 
 Web 版：
 

@@ -7,7 +7,7 @@
 ## 项目结构
 
 ```
-dsh-skin-studio/
+dsh-appearance-studio/
 ├── package.json          # dsh.bundle.patch + dsh.client 两个声明
 ├── cordis.patch.yml      # 宿主侧挂载行
 ├── lib/index.js          # 宿主：设置持久化、图片与 ICO 处理、图标落地、HTTP 路由

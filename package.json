@@ -16,11 +16,11 @@
   "author": "HealtherAnna",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/HealtherAnna/dsh-skin-studio.git"
+    "url": "git+https://github.com/HealtherAnna/dsh-appearance-studio.git"
   },
-  "homepage": "https://github.com/HealtherAnna/dsh-skin-studio#readme",
+  "homepage": "https://github.com/HealtherAnna/dsh-appearance-studio#readme",
   "bugs": {
-    "url": "https://github.com/HealtherAnna/dsh-skin-studio/issues"
+    "url": "https://github.com/HealtherAnna/dsh-appearance-studio/issues"
   },
   "type": "module",
   "main": "lib/index.js",

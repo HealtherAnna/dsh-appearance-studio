@@ -255,24 +255,142 @@ window.__ModuleLoader__.load({
     }
 
     function Slider(props) {
+      // 已滑过那一段轨道的填充比例交给 CSS（--dshskin-pct），
+      // 滑块本身的形状 / 配色全部由 panel.css 决定，这里不动外观。
+      var span = Number(props.max) - Number(props.min)
+      var pct = span > 0 ? (Number(props.value) - Number(props.min)) / span : 0
+      pct = Math.max(0, Math.min(1, isFinite(pct) ? pct : 0))
       return h(Row, null,
         h('span', { className: 'dshskin-label', style: { width: 56 } }, props.label),
         h('input', {
           className: 'dshskin-range', type: 'range',
           min: props.min, max: props.max, step: props.step || 1,
           value: props.value,
+          style: { '--dshskin-pct': pct },
           onChange: function (e) { props.onChange(Number(e.target.value)) },
         }),
         h('span', { className: 'dshskin-value' }, props.display))
     }
 
+    /**
+     * 勾选框对齐 DSH 规格：橙色实心方块 + 白色对勾。
+     * 原生勾选框画不出这个形状，所以 input 藏起来、由 .dshskin-box 画外观；
+     * input 必须留在 label 内且紧邻 box（CSS 用 `+` 取兄弟），这样键盘操作和
+     * 读屏语义都还在——不要改成 onclick 的纯 div。
+     */
+    function Check(props) {
+      return h('label', { className: 'dshskin-checkwrap' },
+        h('input', {
+          className: 'dshskin-check', type: 'checkbox',
+          checked: !!props.checked, disabled: !!props.disabled,
+          onChange: function (e) { props.onChange(e.target.checked) },
+        }),
+        h('span', { className: 'dshskin-box' }))
+    }
+
+    function caretIcon() {
+      return h('svg', { className: 'dshskin-caret', width: 12, height: 12, viewBox: '0 0 12 12', 'aria-hidden': 'true' },
+        h('path', {
+          d: 'M3 4.5 6 7.5 9 4.5', fill: 'none', stroke: 'currentColor',
+          strokeWidth: 1.3, strokeLinecap: 'round', strokeLinejoin: 'round',
+        }))
+    }
+
+    function tickIcon() {
+      return h('svg', { className: 'dshskin-tick', width: 14, height: 14, viewBox: '0 0 14 14', 'aria-hidden': 'true' },
+        h('path', {
+          d: 'M3 7.4 5.6 10 11 4.4', fill: 'none', stroke: 'currentColor',
+          strokeWidth: 1.6, strokeLinecap: 'round', strokeLinejoin: 'round',
+        }))
+    }
+
+    /**
+     * 自绘下拉。
+     *
+     * 为什么不用原生 <select>：弹出菜单是操作系统画的，那圈直角边框、蓝色选中条
+     * 和系统高亮都改不了，和 DSH 的菜单必然是两个样子。所以触发器+菜单全部自绘，
+     * 再自己补回原生 <select> 本来就有的行为：点外面关闭、Esc 关闭并把焦点还给
+     * 触发器、上下键移动、角色与 aria 状态。
+     * 改动这里时别把键盘操作去掉——那是原生控件被换掉后唯一容易丢的东西。
+     */
     function Select(props) {
-      return h('select', {
-        className: 'dshskin-select', value: props.value,
-        onChange: function (e) { props.onChange(e.target.value) },
-      }, props.options.map(function (o) {
-        return h('option', { key: o[0], value: o[0] }, o[1])
-      }))
+      var os = react.useState(false); var open = os[0]; var setOpen = os[1]
+      var wrapRef = react.useRef(null)
+      var btnRef = react.useRef(null)
+
+      react.useEffect(function () {
+        if (!open) return undefined
+        function onDocDown(e) {
+          if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false)
+        }
+        document.addEventListener('mousedown', onDocDown)
+        return function () { document.removeEventListener('mousedown', onDocDown) }
+      }, [open])
+
+      var opts = props.options || []
+      var current = null
+      for (var i = 0; i < opts.length; i += 1) {
+        if (String(opts[i][0]) === String(props.value)) current = opts[i]
+      }
+      if (!current && opts.length) current = opts[0]
+
+      function choose(v) {
+        setOpen(false)
+        if (btnRef.current) btnRef.current.focus()
+        props.onChange(v)
+      }
+
+      function onTriggerKey(e) {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+          e.preventDefault()
+          setOpen(true)
+        } else if (e.key === 'Escape') {
+          setOpen(false)
+        }
+      }
+
+      function onMenuKey(e) {
+        if (e.key === 'Escape') {
+          e.preventDefault()
+          setOpen(false)
+          if (btnRef.current) btnRef.current.focus()
+          return
+        }
+        if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return
+        e.preventDefault()
+        var idx = -1
+        for (var j = 0; j < opts.length; j += 1) {
+          if (String(opts[j][0]) === String(props.value)) idx = j
+        }
+        var next = e.key === 'ArrowDown'
+          ? Math.min(opts.length - 1, idx + 1)
+          : Math.max(0, (idx < 0 ? 0 : idx) - 1)
+        if (opts[next]) props.onChange(opts[next][0])
+      }
+
+      return h('div', { className: 'dshskin-selectwrap', ref: wrapRef },
+        h('button', {
+          type: 'button', ref: btnRef, className: 'dshskin-selectbtn',
+          disabled: !!props.disabled,
+          'aria-haspopup': 'listbox',
+          'aria-expanded': open ? 'true' : 'false',
+          onClick: function () { setOpen(!open) },
+          onKeyDown: onTriggerKey,
+        },
+          h('span', null, current ? current[1] : ''),
+          caretIcon()),
+        open
+          ? h('div', { className: 'dshskin-menu', role: 'listbox', tabIndex: -1, onKeyDown: onMenuKey },
+              opts.map(function (o) {
+                var on = String(o[0]) === String(props.value)
+                return h('button', {
+                  key: o[0], type: 'button', className: 'dshskin-mi',
+                  role: 'option', 'aria-selected': on ? 'true' : 'false',
+                  'data-on': on ? '1' : '0',
+                  onClick: function () { choose(o[0]) },
+                }, h('span', null, o[1]), tickIcon())
+              }))
+          : null)
     }
 
     // ── 主面板 ──────────────────────────────────────────────────────────────
@@ -418,9 +536,9 @@ window.__ModuleLoader__.load({
       var themePane = h('div', { className: 'dshskin-pane' },
         h(Row, { between: true },
           h('span', { className: 'dshskin-label' }, '启用自定义主题色'),
-          h('input', {
-            className: 'dshskin-check', type: 'checkbox', checked: !!draft.theme.enabled,
-            onChange: function (e) { patch('theme', 'enabled', e.target.checked) },
+          h(Check, {
+            checked: !!draft.theme.enabled,
+            onChange: function (v) { patch('theme', 'enabled', v) },
           })),
         h(Row, null,
           h('input', {
@@ -468,9 +586,9 @@ window.__ModuleLoader__.load({
           h('br'), '支持 png / jpg / webp / gif / bmp'),
         h(Row, { between: true },
           h('span', { className: 'dshskin-label' }, '启用背景图'),
-          h('input', {
-            className: 'dshskin-check', type: 'checkbox', checked: !!draft.wallpaper.enabled,
-            onChange: function (e) { patch('wallpaper', 'enabled', e.target.checked) },
+          h(Check, {
+            checked: !!draft.wallpaper.enabled,
+            onChange: function (v) { patch('wallpaper', 'enabled', v) },
           })),
         h(Slider, {
           label: '背景可见度', min: 2, max: 100, value: Math.round(draft.wallpaper.opacity * 100),

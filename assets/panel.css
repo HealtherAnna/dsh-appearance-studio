@@ -7,9 +7,27 @@
  *
  * 全部类名以 .dshskin- 前缀隔离，避免与 DSH 自身样式冲突；
  * 配色一律优先取 DSH 的设计令牌 --dsw-*，这样明暗主题自动跟随。
+ *
+ * 控件（按钮 / 表单 / 勾选框 / 滑块）刻意**照 DSH 自身控件的规格**写：
+ * 主强调色是橙色，滑块是「圆角药丸轨道 + 圆形滑块」，勾选框是「橙色实心方块 +
+ * 白色对勾」。所以这几个控件都不能用原生默认外观 + accent-color 糊一层
+ * ——系统配色在明暗主题下不受控，会明显和设置页其余控件对不上，
+ * 因此统一 appearance:none 之后自己画。
+ *
+ * 强调色只在 .dshskin 作用域里声明一次（--dshskin-accent），控件都引用它。
+ * 优先取 DSH 的交互色令牌，取不到才退回橙色的实际取值。
  * ========================================================================== */
 
 .dshskin {
+  --dshskin-accent: var(--dsw-alias-state-business-primary, #ff7a45);
+  --dshskin-accent-hover: var(--dsw-static-deepseek-600, #e5642f);
+  --dshskin-accent-active: var(--dsw-static-deepseek-800, #b9461c);
+  --dshskin-focus: var(--dsw-focus-ring-color, rgba(255, 122, 69, .24));
+  --dshskin-fill: var(--dsw-alias-fill-input, rgba(128, 128, 128, .24));
+  --dshskin-border: var(--dsw-alias-border-l2, #d8d8dd);
+  --dshskin-border-strong: var(--dsw-alias-border-l3, #c8c8d0);
+  --dshskin-hover: var(--dsw-alias-interactive-bg-hover, rgba(0, 0, 0, .045));
+
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -54,13 +72,13 @@
   transition: color .12s, background .12s;
 }
 .dshskin-tab:hover {
-  background: var(--dsw-alias-interactive-bg-hover, rgba(0, 0, 0, .045));
+  background: var(--dshskin-hover);
   color: var(--dsw-alias-label-primary, #111);
 }
 .dshskin-tab[data-on="1"] {
   color: var(--dsw-alias-label-primary, #111);
   font-weight: 600;
-  border-bottom-color: var(--dsw-static-deepseek-500, #4176e6);
+  border-bottom-color: var(--dshskin-accent);
 }
 
 /* ── 面板与卡片 ─────────────────────────────────────────────────────────── */
@@ -72,7 +90,7 @@
 .dshskin-pane[hidden] { display: none; }
 
 .dshskin-card {
-  border: 1px solid var(--dsw-alias-border-l2, #e2e2e6);
+  border: 1px solid var(--dshskin-border);
   border-radius: 10px;
   padding: 14px;
   display: flex;
@@ -134,47 +152,294 @@
 }
 
 /* ── 控件 ───────────────────────────────────────────────────────────────── */
+/* 色板：原生取色框在各浏览器里带一圈内衬和圆角，统一抹平后再自己描边 */
 .dshskin-color {
+  appearance: none;
+  -webkit-appearance: none;
   width: 46px;
   height: 30px;
   padding: 0;
-  border: 1px solid var(--dsw-alias-border-l2, #d8d8dd);
+  border: 1px solid var(--dshskin-border);
   border-radius: 8px;
   background: transparent;
   cursor: pointer;
   flex: none;
 }
+.dshskin-color::-webkit-color-swatch-wrapper { padding: 0; }
+.dshskin-color::-webkit-color-swatch {
+  border: 0;
+  border-radius: 7px;
+}
+.dshskin-color::-moz-color-swatch {
+  border: 0;
+  border-radius: 7px;
+}
+.dshskin-color:hover { border-color: var(--dshskin-border-strong); }
+
+/* 文本输入：和下拉、按钮同高同圆角，才是同一套控件 */
 .dshskin-hex {
   flex: 1;
   min-width: 0;
-  padding: 6px 9px;
+  height: 32px;
+  padding: 0 10px;
   border-radius: 8px;
   font: 12px ui-monospace, Consolas, monospace;
   text-transform: lowercase;
-  border: 1px solid var(--dsw-alias-border-l2, #d8d8dd);
+  border: 1px solid var(--dshskin-border);
   background: var(--dsw-alias-bg-layer-2, transparent);
   color: inherit;
+  transition: border-color .12s, box-shadow .12s;
 }
+.dshskin-hex:hover { border-color: var(--dshskin-border-strong); }
+.dshskin-hex:focus,
+.dshskin-hex:focus-visible {
+  outline: none;
+  border-color: var(--dshskin-accent);
+  box-shadow: 0 0 0 3px var(--dshskin-focus);
+}
+
+/* 滑块：DSH 是「药丸轨道 + 圆形滑块」，已滑过的一段填充为强调色。
+   填充比例由 client.js 内联的 --dshskin-pct 提供（0~1）。 */
 .dshskin-range {
+  appearance: none;
+  -webkit-appearance: none;
   flex: 1;
   min-width: 0;
-  accent-color: var(--dsw-static-deepseek-500, #4176e6);
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
 }
+.dshskin-range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--dshskin-accent) 0,
+    var(--dshskin-accent) calc(var(--dshskin-pct, 0) * 100%),
+    var(--dshskin-fill) calc(var(--dshskin-pct, 0) * 100%),
+    var(--dshskin-fill) 100%
+  );
+}
+.dshskin-range::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -4px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--dshskin-accent);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .22);
+  transition: transform .12s;
+}
+.dshskin-range:hover::-webkit-slider-thumb { transform: scale(1.12); }
+.dshskin-range::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--dshskin-fill);
+}
+.dshskin-range::-moz-range-progress {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--dshskin-accent);
+}
+.dshskin-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--dshskin-accent);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .22);
+}
+.dshskin-range:focus { outline: none; }
+.dshskin-range:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px var(--dshskin-focus);
+}
+.dshskin-range:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 3px var(--dshskin-focus);
+}
+
+/* 下拉：抹掉原生外观，箭头自己画，才能和输入框、按钮齐平 */
 .dshskin-select {
-  padding: 6px 8px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  height: 32px;
+  min-width: 104px;
+  padding: 0 30px 0 11px;
   border-radius: 8px;
   font-family: inherit;
   font-size: 12px;
-  border: 1px solid var(--dsw-alias-border-l2, #d8d8dd);
-  background: var(--dsw-alias-bg-layer-2, transparent);
-  color: inherit;
+  line-height: 1;
+  border: 1px solid var(--dshskin-border);
+  background-color: var(--dsw-alias-bg-layer-2, transparent);
+  color: var(--dsw-alias-label-primary, #111);
+  cursor: pointer;
+  transition: border-color .12s, background-color .12s;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5 6 7.5 9 4.5' fill='none' stroke='%238b8b93' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+.dshskin-select:hover {
+  border-color: var(--dshskin-border-strong);
+  background-color: var(--dsw-alias-interactive-bg-hover, rgba(0, 0, 0, .045));
+}
+.dshskin-select:focus,
+.dshskin-select:focus-visible {
+  outline: none;
+  border-color: var(--dshskin-accent);
+  box-shadow: 0 0 0 3px var(--dshskin-focus);
+}
+.dshskin-select option {
+  background: var(--dsw-alias-bg-layer-2, #fff);
+  color: var(--dsw-alias-label-primary, #111);
+}
+
+/* 自绘下拉：原生 <select> 的弹出菜单由操作系统绘制，它的蓝色选中条、直角边框
+   都改不了，所以触发器画成 DSH 那种「无边框浅灰底」，菜单自己用绝对定位画。 */
+.dshskin-selectwrap {
+  position: relative;
+  flex: none;
+}
+.dshskin-selectbtn {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 104px;
+  max-width: 200px;
+  height: 34px;
+  padding: 0 12px 0 14px;
+  border: 0;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1;
+  text-align: left;
+  cursor: pointer;
+  color: var(--dsw-alias-label-primary, #111);
+  background: var(--dsw-alias-interactive-bg-hover, rgba(0, 0, 0, .045));
+  transition: background-color .12s;
+}
+.dshskin-selectbtn:hover { background: var(--dsw-alias-interactive-bg-pressed, rgba(0, 0, 0, .075)); }
+.dshskin-selectbtn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--dshskin-focus);
+}
+.dshskin-selectbtn:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+.dshskin-selectbtn > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dshskin-caret {
+  flex: none;
+  color: var(--dsw-alias-label-tertiary, #8b8b93);
+  transition: transform .15s;
+}
+.dshskin-selectbtn[aria-expanded="true"] .dshskin-caret { transform: rotate(180deg); }
+
+/* 菜单：圆角 + 柔和阴影 + 选中项打勾（照 DSH，不用系统蓝条高亮） */
+.dshskin-menu {
+  position: absolute;
+  z-index: 60;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 100%;
+  max-height: 264px;
+  overflow-y: auto;
+  padding: 6px;
+  border-radius: 10px;
+  background: var(--dsw-alias-bg-layer-3, var(--dsw-alias-bg-layer-2, #fff));
+  box-shadow: 0 6px 24px rgba(0, 0, 0, .14), 0 0 0 1px var(--dsw-alias-border-l1, rgba(0, 0, 0, .06));
+}
+.dshskin-mi {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.2;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  color: var(--dsw-alias-label-primary, #111);
+}
+.dshskin-mi:hover,
+.dshskin-mi:focus-visible {
+  outline: none;
+  background: var(--dsw-alias-interactive-bg-hover, rgba(0, 0, 0, .06));
+}
+.dshskin-mi .dshskin-tick {
+  flex: none;
+  visibility: hidden;
+  color: var(--dsw-alias-label-primary, #111);
+}
+.dshskin-mi[data-on="1"] .dshskin-tick { visibility: visible; }
+
+/* 勾选框：DSH 是橙色实心方块 + 白色对勾（原生勾选框画不出这个形状，
+   所以隐藏 input，用 .dshskin-box 画外观，对勾用内联 SVG 背景） */
+.dshskin-checkwrap {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  cursor: pointer;
+}
+.dshskin-checkwrap:has(.dshskin-check:disabled) {
+  cursor: not-allowed;
+  opacity: .45;
 }
 .dshskin-check {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.dshskin-box {
   width: 16px;
   height: 16px;
-  flex: none;
-  accent-color: var(--dsw-static-deepseek-500, #4176e6);
-  cursor: pointer;
+  box-sizing: border-box;
+  border-radius: 4px;
+  border: 1px solid var(--dshskin-border-strong);
+  background: var(--dsw-alias-bg-layer-2, #fff);
+  transition: background-color .12s, border-color .12s, box-shadow .12s;
+}
+.dshskin-checkwrap:hover .dshskin-box {
+  border-color: var(--dshskin-accent);
+}
+.dshskin-check:checked + .dshskin-box {
+  border-color: var(--dshskin-accent);
+  background-color: var(--dshskin-accent);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2.6 6.3 4.9 8.6 9.4 3.7' fill='none' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.dshskin-check:focus-visible + .dshskin-box {
+  box-shadow: 0 0 0 3px var(--dsw-focus-ring-color, rgba(255, 122, 69, .26));
+}
+.dshskin-check:disabled + .dshskin-box {
+  border-color: var(--dshskin-border);
+  background-color: var(--dsw-alias-fill-input, rgba(128, 128, 128, .12));
+  background-image: none;
 }
 
 /* ── 色板 ───────────────────────────────────────────────────────────────── */
@@ -193,33 +458,68 @@
 }
 .dshskin-sw:hover { transform: scale(1.09); }
 .dshskin-sw[data-on="1"] {
-  box-shadow: 0 0 0 2px var(--dsw-alias-bg-layer-1, #fff), 0 0 0 4px var(--dsw-static-deepseek-500, #4176e6);
+  box-shadow: 0 0 0 2px var(--dsw-alias-bg-layer-1, #fff), 0 0 0 4px var(--dshskin-accent);
 }
 
 /* ── 按钮 ───────────────────────────────────────────────────────────────── */
+/* 次要按钮：浅底细描边；主按钮：强调色实心。两者同高同圆角、同为一个字重阶梯，
+   和下拉 / 输入框放在一行时基线才对得上。 */
 .dshskin-btn {
   appearance: none;
-  padding: 7px 14px;
+  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 14px;
   border-radius: 8px;
   font-size: 12px;
   font-family: inherit;
+  line-height: 1;
+  white-space: nowrap;
   cursor: pointer;
-  border: 1px solid var(--dsw-alias-border-l2, #d8d8dd);
+  border: 1px solid var(--dshskin-border);
   background: var(--dsw-alias-bg-layer-2, transparent);
   color: var(--dsw-alias-label-primary, #111);
-  transition: background .12s, filter .12s;
+  transition: background-color .12s, border-color .12s, box-shadow .12s, filter .12s;
 }
-.dshskin-btn:hover { background: var(--dsw-alias-interactive-bg-hover, rgba(0, 0, 0, .05)); }
-.dshskin-btn:disabled { opacity: .45; cursor: not-allowed; }
+.dshskin-btn:hover {
+  background: var(--dshskin-hover);
+  border-color: var(--dshskin-border-strong);
+}
+.dshskin-btn:active { background: var(--dsw-alias-interactive-bg-pressed, rgba(0, 0, 0, .08)); }
+.dshskin-btn:focus-visible {
+  outline: none;
+  border-color: var(--dshskin-accent);
+  box-shadow: 0 0 0 3px var(--dshskin-focus);
+}
+.dshskin-btn:disabled,
+.dshskin-btn:disabled:hover {
+  opacity: .45;
+  cursor: not-allowed;
+  background: var(--dsw-alias-bg-layer-2, transparent);
+  border-color: var(--dshskin-border);
+}
 .dshskin-btn.primary {
-  background: var(--dsw-static-deepseek-500, #4176e6);
+  background: var(--dshskin-accent);
   border-color: transparent;
   color: #fff;
   font-weight: 600;
 }
-.dshskin-btn.primary:hover { filter: brightness(1.08); }
+.dshskin-btn.primary:hover {
+  background: var(--dsw-static-deepseek-600, #e5642f);
+  border-color: transparent;
+  filter: none;
+}
+.dshskin-btn.primary:active { background: var(--dsw-static-deepseek-800, #b9461c); }
+.dshskin-btn.primary:disabled,
+.dshskin-btn.primary:disabled:hover {
+  background: var(--dshskin-accent);
+  border-color: transparent;
+}
 .dshskin-bar {
   display: flex;
+  align-items: center;
   gap: 8px;
   justify-content: flex-end;
   flex-wrap: wrap;
@@ -227,7 +527,7 @@
 
 /* ── 背景图上拖放区 ─────────────────────────────────────────────────────── */
 .dshskin-drop {
-  border: 1px dashed var(--dsw-alias-border-l3, #c8c8d0);
+  border: 1px dashed var(--dshskin-border-strong);
   border-radius: 10px;
   padding: 20px 14px;
   text-align: center;
@@ -239,7 +539,7 @@
 }
 .dshskin-drop:hover,
 .dshskin-drop[data-over="1"] {
-  border-color: var(--dsw-static-deepseek-500, #4176e6);
+  border-color: var(--dshskin-accent);
   background: var(--dsw-alias-interactive-bg-hover, rgba(0, 0, 0, .03));
 }
 .dshskin-thumb {
