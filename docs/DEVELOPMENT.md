@@ -14,7 +14,7 @@ dsh-appearance-studio/
 ├── client/client.js      # 客户端：设置页里的「外观工作室」面板（React）
 ├── assets/panel.css      # 面板样式，由宿主作为 index-inject 的 style 行注入
 └── test/
-    ├── smoke.mjs         # 41 项：mock cordis 上下文 + 真实 HTTP 服务器
+    ├── smoke.mjs         # 45 项：mock cordis 上下文 + 真实 HTTP 服务器
     └── icon-scale-check.mjs  # 用真实大图验证多尺寸 ICO 的声明/实际尺寸一致
 ```
 
@@ -120,14 +120,15 @@ ctx.slots.inject('settings.section', () => {
 
 插件跑在 `dsh-desktop-host` 子进程里（Electron 以 `ELECTRON_RUN_AS_NODE` 启动它），拿不到 `electron` 模块，与 Electron 壳之间只有固定的几种 IPC 消息，**没有图标通道**。
 
-但主进程是按磁盘路径读图的，所以"替换文件 + 重启"就是最干净的可行路径：
+主进程在启动时按磁盘路径读取托盘图标：
 
 ```js
 const trayIconPath = join(process.resourcesPath, 'tray.ico')
 tray = new DesktopTray({ iconPath: trayIconPath })        // 托盘
-... { icon: nativeImage.createFromPath(trayIconPath) }    // 窗口图标（同一文件）
 // process.resourcesPath/icon.png 只用于「关于」面板
 ```
+
+DSH 44.11.5 的主窗口没有传入图标。Windows 桌面宿主因此启动 `lib/window-icon.ps1`，只向所属 DSH 主窗口发送 `WM_SETICON`，并在还原时恢复窗口原先的图标。辅助进程在宿主退出时关闭，以保证 Windows 图标句柄在使用期间有效。
 
 ---
 
@@ -146,7 +147,7 @@ tray = new DesktopTray({ iconPath: trayIconPath })        // 托盘
 ## 测试
 
 ```bash
-node test/smoke.mjs            # 41 项：路由、上传、备份还原、信任栅栏
+node test/smoke.mjs            # 45 项：路由、上传、备份还原、信任栅栏
 node test/icon-scale-check.mjs # 用真实大图验证多尺寸 ICO
 ```
 

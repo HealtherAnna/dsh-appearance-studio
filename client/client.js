@@ -654,12 +654,10 @@ window.__ModuleLoader__.load({
       }
 
       var iconsPane = h('div', { className: 'dshskin-pane' },
-        // 一个入口就够了：Electron 主进程里窗口图标与托盘图标读的是同一个
-        // resources/tray.ico；uploads PNG 时顺带更新「关于」面板的 icon.png。
-        iconSlot('tray', '托盘 / 窗口图标', '.ico,.png', trayInfo, 'icon-tray'),
+        iconSlot('tray', '任务栏 / 托盘图标', '.ico,.png', trayInfo, 'icon-tray'),
         h('div', { className: 'dshskin-warn' },
-          '⚠ 图标写入的是 DSH 安装目录的 resources/tray.ico 与 resources/icon.png，必须重启客户端才生效。' +
-          '原图标会自动备份，可随时「还原原图标」。DSH 升级会覆盖这两个文件，升级后重新点一次「应用到客户端」即可。'),
+          '应用后，从「应用 → 退出」完全关闭 DSH 再打开，托盘图标才会刷新。' +
+          'Windows 可能把托盘图标放在任务栏右侧的「^」菜单里。原图标会自动备份。'),
         h(Row, null,
           h('span', { className: 'dshskin-label' }, '安装目录'),
           h('span', { className: 'dshskin-mono', style: { flex: 1 } },

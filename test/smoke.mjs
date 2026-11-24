@@ -151,6 +151,18 @@ async function post(p, body) {
   check('图标预览 = 200', prev.status === 200, prev.status)
   check('预览 Content-Type 是 x-icon', prev.type.includes('x-icon'), prev.type)
 
+  fs.unlinkSync(path.join(HOME, 'dsh-skin', 'app.png'))
+  const icoUpload = await post('/dsh-skin/icon-upload.json', {
+    kind: 'both',
+    data: 'data:image/x-icon;base64,' + src.toString('base64'),
+  })
+  check('仅上传 ICO 成功', icoUpload.status === 200)
+  const icoApply = await post('/dsh-skin/icon-apply.json', { kind: 'all' })
+  check('仅上传 ICO 时可应用', icoApply.status === 200 && icoApply.json.results.tray.ok)
+  check('写入用户上传的 ICO', fs.readFileSync(path.join(FAKE_RESOURCES, 'tray.ico')).equals(src))
+  const icoRestore = await post('/dsh-skin/icon-restore.json', { kind: 'all' })
+  check('仅应用 ICO 时可还原', icoRestore.status === 200 && icoRestore.json.results.tray.ok)
+
   const appUp = await post('/dsh-skin/icon-upload.json', { kind: 'app', data: PNG_1X1 })
   check('上传应用图标(PNG) = 200', appUp.status === 200, appUp.status)
 
